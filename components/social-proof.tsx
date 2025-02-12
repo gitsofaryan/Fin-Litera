@@ -7,6 +7,7 @@ const companies = [
     "Instagram",
     "Uber",
     "Spotify",
+    ""
   ];
   
   export function Companies() {
