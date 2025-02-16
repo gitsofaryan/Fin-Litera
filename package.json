@@ -34,7 +34,7 @@
     "micro": "^10.0.1",
     "nanoid": "^5.0.6",
     "next": "14.0.4",
-    "next-auth": "^4.24.6",
+    "next-auth": "^4.24.11",
     "next-headers": "^0.0.5",
     "next-themes": "^0.2.1",
     "prisma": "^5.10.2",

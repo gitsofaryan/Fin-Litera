@@ -1,3 +1,4 @@
+// 'use strict';
 import { MainNav } from "@/components/main-nav";
 // import { MobileNav } from "@/components/mobile-nav";
 import { cn } from "@/lib/utils";
@@ -22,8 +23,8 @@ import { getAuthSession } from "@/lib/auth";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Quote AI",
-  description: "Generate Daily Quotes",
+  title: "FinLitera AI",
+  description: "FinLitera AI is a platform that helps you manage your finances",
 };
 
 export default function RootLayout({

@@ -11,6 +11,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { signIn } from 'next-auth/react';
 import { useToast } from "@/hooks/use-toast";
 import { title } from "process";
+import { redirect } from "next/dist/server/api-utils";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
