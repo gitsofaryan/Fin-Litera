@@ -63,3 +63,37 @@ export type UserSubscriptionPlan = SubscriptionPlan &
     stripeCurrentPeriodEnd: number
     isPro: boolean
   }
+
+  export interface Message {
+  id: string
+  content: string
+  role: "user" | "assistant"
+  timestamp: Date
+  attachments?: string[]
+}
+
+export interface StockData {
+  symbol: string
+  price: number
+  change: number
+  changePercent: number
+}
+
+export interface NewsItem {
+  id: string
+  title: string
+  source: string
+  timestamp: Date
+  category: "stocks" | "crypto" | "economy" | "general"
+}
+
+export interface PortfolioItem {
+  symbol: string
+  shares: number
+  avgPrice: number
+  currentPrice: number
+  totalValue: number
+  gain: number
+  gainPercent: number
+}
+

@@ -106,19 +106,8 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
     <div className="flex min-h-screen">
       
       {/* Sidebar Navigation */}
-        <Link
-          href="/#"
-          className={cn(
-            buttonVariants({ variant: "ghost" }),
-            "absolute left-4 top-4 md:left-8 md:top-8"
-          )}
-        >
-          <>
-            <Icons.chevronLeft className="mr-2 h-4 w-4" />
-            Back
-          </>
-        </Link>
-      <aside className="w-64 bg-black text-white h-screen p-4 space-y-4 fixed mt-20">
+  
+      <aside className="w-64 bg-black text-white h-screen p-4 space-y-4 fixed">
         <h2 className="text-lg font-bold">Finance Dashboard</h2>
         <nav className="space-y-2">
           <Link href="/chat" className="block p-2 rounded hover:bg-gray-700">FinLitera AI</Link>
