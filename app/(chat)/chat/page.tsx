@@ -157,7 +157,7 @@ export default function Chat() {
             const aiResponse: Message = {
                 id: (Date.now() + 1).toString(),
                 content: response.data.generatedContent || "Sorry, I couldn't understand that.",
-                role: 'Finance assistant',
+                role: 'assistant',
                 timestamp: new Date(),
             };
 
