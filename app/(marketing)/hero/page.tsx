@@ -56,12 +56,12 @@ function HeroPage() {
         <div className="flex items-center justify-center flex-row space-x-4">
 
         </div>
-        <div className="relative rounded-xl mx-auto justify-center flex flex-col items-center lg:max-w-[1000px] overflow-hidden md:overflow-auto lg:overflow-auto">
-          <iframe src="https://finlitera.streamlit.app/?embed=true&embed_options=show_toolbar&embed_options=show_padding&embed_options=show_footer&embed_options=show_colored_line" height={600} width={1000} frameBorder={0}></iframe>
+        <div className="relative rounded-xl mx-auto justify-center flex flex-col items-center lg:max-w-[1000px] overflow-hidden overscroll-none">
+          <iframe src="https://finlitera.streamlit.app/?embed=true&embed_options=show_toolbar&embed_options=show_padding&embed_options=show_footer&embed_options=show_colored_line&embed_options=disable_scrolling"  height={600} width={1000} frameBorder={0}></iframe>
           <BorderBeam size={300} />
         </div>
 
-        <div className="relative rounded-xl mx-auto justify-center flex flex-col items-center lg:max-w-[1000px] overflow-hidden md:overflow-auto lg:overflow-auto">
+        <div className="relative rounded-xl mx-auto justify-center flex flex-col items-center lg:max-w-[1000px] overflow-hidden overscroll-none">
           <img
             src="/darkoutput.png"
             alt="Hero Image"

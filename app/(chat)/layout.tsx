@@ -1,20 +1,19 @@
-import { ThemeProvider } from "@/components/theme-provider"
-import type React from "react"
+"use client";
 
-export default function RootLayout({
+import { Toaster } from "@/components/ui/toaster"
+
+export default function ChatLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
     return (
-        <html lang="en" suppressHydrationWarning>
-            <head />
-            <body>
-                <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-                    {children}
-                </ThemeProvider>
-            </body>
-        </html>
+        <>
+            <div className="min-h-screen bg-background">
+                {children}
+            </div>
+            <Toaster />
+        </>
     )
 }
 

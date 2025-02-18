@@ -1,51 +1,61 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Bell, MessageSquare, Settings, User2, Wallet, LineChart, Newspaper, Plus } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-// import { ModeToggle } from "@components/toggle"
-import { StockChart } from "@/components/stock-chart"
-import { PortfolioSummary } from "@/components/portfolio-summary"
-import { NewsFeed } from "@/components/news-feed"
-import { ChatInput } from "@/components/chat-input"
-import { LoggedInNav } from "@/components/loggedin-nav"
+import { useState, useEffect } from "react";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
+import {
+    Bell,
+    MessageSquare,
+    Settings,
+    User2,
+    Wallet,
+    LineChart,
+    Newspaper,
+    Plus,
+    Trash2,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { StockChart } from "@/components/stock-chart";
+import { PortfolioSummary } from "@/components/portfolio-summary";
+import { NewsFeed } from "@/components/news-feed";
+import { ChatInput } from "@/components/chat-input";
+import { LoggedInNav } from "@/components/loggedin-nav";
+import { ModeToggle } from "@/components/toggle";
+// import { UserAccountNav } from "@/components/user-account-nav";
+import axios from "axios";
+import ReactMarkdown from 'react-markdown';
 import { SiteFooter } from "@/components/site-footer";
-import { ModeToggle } from "@/components/toggle"
-import { UserAccountNav } from "@/components/user-account-nav"
-import axios from "axios"
-
-// import type { Message, NewsItem, PortfolioItem } from "@/utils/types"
-
-// Mock data
-
 
 interface Message {
-    id: string
-    content: string
-    role: "user" | "assistant"
-    timestamp: Date
-    attachments?: string[]
+    id: string;
+    content: string;
+    role: "user" | "assistant";
+    timestamp: Date;
+    attachments?: string[];
 }
 
 interface NewsItem {
-    id: string
-    title: string
-    source: string
-    timestamp: Date
-    category: "stocks" | "crypto" | "economy" | "general"
+    id: string;
+    title: string;
+    source: string;
+    timestamp: Date;
+    category: "stocks" | "crypto" | "economy" | "general";
 }
 
 interface PortfolioItem {
-    symbol: string
-    shares: number
-    avgPrice: number
-    currentPrice: number
-    totalValue: number
-    gain: number
-    gainPercent: number
+    symbol: string;
+    shares: number;
+    avgPrice: number;
+    currentPrice: number;
+    totalValue: number;
+    gain: number;
+    gainPercent: number;
 }
 
 const mockPortfolio: PortfolioItem[] = [
@@ -58,8 +68,7 @@ const mockPortfolio: PortfolioItem[] = [
         gain: 300,
         gainPercent: 20,
     },
-    // Add more mock portfolio items...
-]
+];
 
 const mockNews: NewsItem[] = [
     {
@@ -69,267 +78,374 @@ const mockNews: NewsItem[] = [
         timestamp: new Date(),
         category: "economy",
     },
-]
+];
 
 interface Chat {
-    id: string
-    name: string
-    messages: Message[]
+    id: string;
+    name: string;
+    messages: Message[];
 }
 
-// const [user, setUser] = useState<{ name: string; image: string; email: string } | null>(null);
-
-
 export default function Chat() {
-    const [chats, setChats] = useState<Chat[]>([])
-    const [currentChatId, setCurrentChatId] = useState<string | null>(null)
+    const [isClient, setIsClient] = useState(false);
+    const [chats, setChats] = useState<Chat[]>([]);
+    const [currentChatId, setCurrentChatId] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
+    // Handle client-side hydration
     useEffect(() => {
-        const savedChats = localStorage.getItem("finlitera-chats")
-        if (savedChats) {
-            setChats(JSON.parse(savedChats))
+        setIsClient(true);
+    }, []);
+
+    // Load chats from localStorage
+    useEffect(() => {
+        if (isClient) {
+            const savedChats = localStorage.getItem("finlitera-chats");
+            if (savedChats) {
+                setChats(JSON.parse(savedChats));
+            }
         }
-    }, [])
+    }, [isClient]);
 
+    // Save chats to localStorage
     useEffect(() => {
-        localStorage.setItem("finlitera-chats", JSON.stringify(chats))
-    }, [chats])
+        if (isClient) {
+            localStorage.setItem("finlitera-chats", JSON.stringify(chats));
+        }
+    }, [chats, isClient]);
 
     const createNewChat = () => {
-        const newChat: Chat = {
-            id: Date.now().toString(),
-            name: `Chat ${chats.length + 1}`,
-            messages: [],
-        }
-        setChats([...chats, newChat])
-        setCurrentChatId(newChat.id)
-    }
+        if (isLoading) return;
 
-
-
-    const geminiAPI = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
-    const apiKey = 'AIzaSyAunvZeGoX4jnIBv5_PCGMzzR0z0AicyCQ'; // Your Gemini API key
-
-    const handleSendMessage = async (content: string, attachments?: File[]) => {
-        if (!currentChatId) return;
-
-        // Create new user message
-        const newMessage: Message = {
-            id: Date.now().toString(),
-            content,
-            role: 'user',
-            timestamp: new Date(),
-            attachments: attachments?.map((file) => URL.createObjectURL(file)),
-        };
-
-        const updatedChats = chats.map((chat) => {
-            if (chat.id === currentChatId) {
-                return { ...chat, messages: [...chat.messages, newMessage] };
-            }
-            return chat;
-        });
-
-        setChats(updatedChats);
-
-        // Send request to Gemini API
         try {
-            const response = await axios.post(
-                geminiAPI + `?key=${apiKey}`,
-                {
-                    contents: [
-                        {
-                            parts: [
-                                { text: content }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
-       
-            console.log("Response from Gemini API", response.data);
-
-            // Assuming the response contains a field 'generatedContent' for the reply
-            const aiResponse: Message = {
-                id: (Date.now() + 1).toString(),
-                content: response.data.generatedContent || "Sorry, I couldn't understand that.",
-                role: 'assistant',
-                timestamp: new Date(),
+            const newChat: Chat = {
+                id: Date.now().toString(),
+                name: `Chat ${chats.length + 1}`,
+                messages: []
             };
 
-            const updatedChatsWithAI = updatedChats.map((chat) => {
+            // Update state immediately
+            setChats(prevChats => [...prevChats, newChat]);
+            // Set current chat ID immediately after creating
+            setCurrentChatId(newChat.id);
+
+            // Save to localStorage
+            if (isClient) {
+                localStorage.setItem(
+                    "finlitera-chats",
+                    JSON.stringify([...chats, newChat])
+                );
+            }
+
+            console.log('New chat created:', newChat);
+        } catch (error) {
+            console.error('Error creating new chat:', error);
+        }
+    };
+
+    const geminiAPI = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+    const apiKey = "AIzaSyDTric7nxJrrX02GzlzSMVyrsZb19wVqjw";
+
+    const handleSendMessage = async (content: string, attachments?: File[]) => {
+        if (!currentChatId || !content.trim()) {
+            console.log('No chat selected or empty message');
+            return;
+        }
+
+        setIsLoading(true);
+
+        try {
+            // Create new user message
+            const newMessage: Message = {
+                id: Date.now().toString(),
+                content: content.trim(),
+                role: "user",
+                timestamp: new Date(),
+                attachments: attachments?.map((file) => URL.createObjectURL(file)),
+            };
+
+            // Update chats with user message
+            const updatedChats = chats.map((chat) => {
                 if (chat.id === currentChatId) {
-                    return { ...chat, messages: [...chat.messages, aiResponse] };
+                    return {
+                        ...chat,
+                        messages: [...chat.messages, newMessage],
+                    };
                 }
                 return chat;
             });
 
-            setChats(updatedChatsWithAI);
-        } catch (error) {
-            console.error("Error while sending message to Gemini API", error);
-            // Optionally handle the error, e.g., send an error message back to the chat
+            setChats(updatedChats);
+
+            // Get conversation context
+            const currentChat = updatedChats.find(chat => chat.id === currentChatId);
+            const conversationContext = currentChat?.messages
+                .slice(-5)
+                .map(msg => `${msg.role}: ${msg.content}`)
+                .join('\n');
+
+            // Send request to Gemini API
+            const response = await axios.post(
+                `${geminiAPI}?key=${apiKey}`,
+                {
+                    contents: [
+                        {
+                            parts: [
+                                {
+                                    text: `You are a financial advisor and investment expert. Previous conversation:\n${conversationContext}\n\nCurrent question: ${content}`
+                                }
+                            ],
+                        },
+                    ],
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            if (response.data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+                const aiResponseContent = response.data.candidates[0].content.parts[0].text;
+
+                const aiResponse: Message = {
+                    id: (Date.now() + 1).toString(),
+                    content: aiResponseContent,
+                    role: "assistant",
+                    timestamp: new Date(),
+                };
+
+                setChats(prevChats =>
+                    prevChats.map((chat) => {
+                        if (chat.id === currentChatId) {
+                            return {
+                                ...chat,
+                                messages: [...chat.messages, aiResponse],
+                            };
+                        }
+                        return chat;
+                    })
+                );
+            } else {
+                throw new Error("Invalid API response format");
+            }
+        } catch (error: any) {
+            console.error('Error in handleSendMessage:', error);
+
+            const errorMessage = error.response?.data?.error?.message ||
+                "An error occurred. Please try again later.";
+
+            // Add error message to chat
+            setChats(prevChats =>
+                prevChats.map((chat) => {
+                    if (chat.id === currentChatId) {
+                        return {
+                            ...chat,
+                            messages: [
+                                ...chat.messages,
+                                {
+                                    id: Date.now().toString(),
+                                    content: errorMessage,
+                                    role: "assistant",
+                                    timestamp: new Date(),
+                                },
+                            ],
+                        };
+                    }
+                    return chat;
+                })
+            );
+        } finally {
+            setIsLoading(false);
         }
     };
 
+    const deleteChat = (chatId: string) => {
+        try {
+            setChats(prevChats => prevChats.filter(chat => chat.id !== chatId));
+            if (currentChatId === chatId) {
+                setCurrentChatId(null);
+            }
+            console.log('Chat deleted:', chatId);
+        } catch (error) {
+            console.error('Error deleting chat:', error);
+        }
+    };
 
-    const currentChat = chats.find((chat) => chat.id === currentChatId)
+    const currentChat = chats.find((chat) => chat.id === currentChatId);
 
     return (
-    <>
-    <div className="flex items-center justify-between p-4 border-b">
-
-            <LoggedInNav/>
-               <div className="flex items-center gap-4 mx-2">
+        <div className="flex flex-col h-screen">
+            {/* Header */}
+            <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                <div className="flex items-center justify-between p-4">
+                    <LoggedInNav />
+                    <div className="flex items-center gap-4 mx-2">
                         <ModeToggle />
-                        {/* <UserAccountNav
-                          user={{
-                            name: user.name,
-                            image: user.image,
-                            email: user.email,
-                          }}
-                        /> */}
-                      </div>
 
-
-    </div>
-        <div className="flex h-screen bg-background">
-            {/* Left Sidebar */}
-            <div className="w-64 border-r flex flex-col">
-                <div className="p-4 border-b">
-                    <h1 className="text-2xl font-bold">Finlitera</h1>
+                    </div>
                 </div>
-
-                <nav className="flex-1 p-4 space-y-2">
-                    <Button variant="outline" className="w-full justify-start gap-2" onClick={createNewChat}>
-                        <Plus className="h-4 w-4" />
-                        New Chat
-                    </Button>
-                    {chats.map((chat) => (
-                        <Button
-                            key={chat.id}
-                            variant={chat.id === currentChatId ? "secondary" : "ghost"}
-                            className="w-full justify-start gap-2"
-                            onClick={() => setCurrentChatId(chat.id)}
-                        >
-                            <MessageSquare className="h-4 w-4" />
-                            {chat.name}
-                        </Button>
-                    ))}
-                    <Button variant="ghost" className="w-full justify-start gap-2">
-                        <Wallet className="h-4 w-4" />
-                        Portfolio
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start gap-2">
-                        <LineChart className="h-4 w-4" />
-                        Markets
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start gap-2">
-                        <Newspaper className="h-4 w-4" />
-                        News
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start gap-2">
-                        <User2 className="h-4 w-4" />
-                        Profile
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start gap-2">
-                        <Settings className="h-4 w-4" />
-                        Settings
-                    </Button>
-                </nav>
-
-            </div>
+            </header>
 
             {/* Main Content */}
-            <div className="flex-1 flex flex-col">
-                <header className="border-b p-4 flex justify-between items-center">
-                    <h2 className="font-semibold">{currentChat ? currentChat.name : "Financial Assistant"}</h2>
-                    <Button variant="ghost" size="icon">
-                        <Bell className="h-5 w-5" />
-                    </Button>
-                </header>
+            <div className="flex flex-1 overflow-hidden">
+                {/* Sidebar */}
+                <aside className="w-64 border-r flex flex-col bg-background">
+                    {/* <div className="p-4 border-b">
+                        <h1 className="text-2xl font-bold">Finlitera</h1>
+                    </div> */}
+                    <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+                        <Button
+                            variant="outline"
+                            className="w-full justify-start gap-2"
+                            onClick={createNewChat}
+                            disabled={isLoading}
+                        >
+                            <Plus className="h-4 w-4" />
+                            New Chat
+                        </Button>
+                        <div className="space-y-2">
+                            {chats.map((chat) => (
+                                <div key={chat.id} className="flex items-center gap-2">
+                                    <Button
+                                        variant={chat.id === currentChatId ? "secondary" : "ghost"}
+                                        className="flex-1 justify-start gap-2 truncate"
+                                        onClick={() => setCurrentChatId(chat.id)}
+                                        disabled={isLoading}
+                                    >
+                                        <MessageSquare className="h-4 w-4 flex-shrink-0" />
+                                        <span className="truncate">{chat.name}</span>
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-100"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            deleteChat(chat.id);
+                                        }}
+                                        disabled={isLoading}
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="pt-4 space-y-2">
+                            <Button variant="ghost" className="w-full justify-start gap-2">
+                                <Wallet className="h-4 w-4" />
+                                Portfolio
+                            </Button>
+                            <Button variant="ghost" className="w-full justify-start gap-2">
+                                <LineChart className="h-4 w-4" />
+                                Markets
+                            </Button>
+                            <Button variant="ghost" className="w-full justify-start gap-2">
+                                <Newspaper className="h-4 w-4" />
+                                News
+                            </Button>
+                            <Button variant="ghost" className="w-full justify-start gap-2">
+                                <User2 className="h-4 w-4" />
+                                Profile
+                            </Button>
+                            <Button variant="ghost" className="w-full justify-start gap-2">
+                                <Settings className="h-4 w-4" />
+                                Settings
+                            </Button>
+                        </div>
+                    </nav>
+                </aside>
 
-                <div className="flex-1 p-4 overflow-auto">
-                    <div className="max-w-4xl mx-auto space-y-4">
-                        {!currentChat ? (
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Welcome to Finlitera! 💰</CardTitle>
-                                    <CardDescription>Your AI-powered financial advisor</CardDescription>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <StockChart
-                                        symbol="DEMO"
-                                        data={[100, 120, 115, 130, 140, 135, 150]}
-                                        labels={["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]}
-                                    />
-                                    <div className="grid md:grid-cols-2 gap-4">
-                                        <PortfolioSummary items={mockPortfolio} />
-                                        <NewsFeed news={mockNews} />
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ) : (
-                            <div className="space-y-4">
-                                {currentChat.messages.map((message) => (
-                                    <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                                        <div
-                                            className={`max-w-[80%] rounded-lg p-4 ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
-                                                }`}
-                                        >
-                                            <p>{message.content}</p>
-                                            {message.attachments?.map((url) => (
-                                                <img
-                                                    key={url}
-                                                    src={url || "/placeholder.svg"}
-                                                    alt="Attachment"
-                                                    className="mt-2 max-w-xs rounded"
-                                                />
-                                            ))}
+                {/* Chat Area */}
+                <main className="flex-1 flex flex-col overflow-hidden relative">
+                    <header className="sticky border-b p-1 flex justify-between items-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                        <h2 className="font-semibold">
+                            {currentChat ? currentChat.name : "Financial Assistant"}
+                        </h2>
+                        <Button variant="ghost" size="icon">
+                            <Bell className="h-5 w-5" />
+                        </Button>
+                    </header>
+
+                    <div className="flex-1 overflow-y-auto p-4">
+                        <div className="max-w-4xl mx-auto space-y-4">
+                            {!currentChat ? (
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Welcome to Finlitera! 💰</CardTitle>
+                                        <CardDescription>
+                                            Your AI-powered financial advisor
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <StockChart
+                                            symbol="DEMO"
+                                            data={[100, 120, 115, 130, 140, 135, 150]}
+                                            labels={["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]}
+                                        />
+                                        <div className="grid md:grid-cols-2 gap-4">
+                                            <PortfolioSummary items={mockPortfolio} />
+                                            <NewsFeed news={mockNews} />
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                                    </CardContent>
+                                </Card>
+                            ) : (
+                                <div className="space-y-4">
+                                    {currentChat.messages.map((message) => (
+                                        <div
+                                            key={message.id}
+                                            className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                                        >
+                                            <div
+                                                className={`max-w-[80%] rounded-lg p-4 ${message.role === "user"
+                                                    ? "bg-blue-500 text-white"
+                                                    : "bg-gray-600 prose prose-invert max-w-none"
+                                                    }`}
+                                            >
+                                                {message.role === "user" ? (
+                                                    <p>{message.content}</p>
+                                                ) : (
+                                                    <ReactMarkdown
+                                                        components={{
+                                                            h1: ({ children }) => <h1 className="text-2xl font-bold mb-4">{children}</h1>,
+                                                            h2: ({ children }) => <h2 className="text-xl font-bold mb-3">{children}</h2>,
+                                                            h3: ({ children }) => <h3 className="text-lg font-bold mb-2">{children}</h3>,
+                                                            p: ({ children }) => <p className="mb-4">{children}</p>,
+                                                            ul: ({ children }) => <ul className="list-disc ml-4 mb-4">{children}</ul>,
+                                                            li: ({ children }) => <li className="mb-1">{children}</li>,
+                                                            a: ({ href, children }) => (
+                                                                <a
+                                                                    href={href}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="text-blue-400 hover:text-blue-300 underline"
+                                                                >
+                                                                    {children}
+                                                                </a>
+                                                            ),
+                                                        }}
+                                                    >
+                                                        {message.content}
+                                                    </ReactMarkdown>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
 
-                <div className="p-4 border-t">
-                    <div className="max-w-4xl mx-auto">
-                        <ChatInput onSend={handleSendMessage} />
+                    <div className="sticky bottom-0 border-t p-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                        <div className="max-w-4xl mx-auto">
+                            <ChatInput
+                                onSend={handleSendMessage}
+                                disabled={!isClient || isLoading || !currentChatId}
+                            />
+                        </div>
                     </div>
-                </div>
-            </div>
-
-            {/* Right Sidebar */}
-            <div className="w-80 border-l">
-                <Tabs defaultValue="portfolio" className="h-full flex flex-col">
-                    <TabsList className="w-full justify-start px-4 pt-4">
-                        <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
-                        <TabsTrigger value="market">Market</TabsTrigger>
-                        <TabsTrigger value="news">News</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="portfolio" className="flex-1 p-4">
-                        <PortfolioSummary items={mockPortfolio} />
-                    </TabsContent>
-                    <TabsContent value="market" className="flex-1 p-4">
-                        <StockChart
-                            symbol="MARKET"
-                            data={[100, 120, 115, 130, 140, 135, 150]}
-                            labels={["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]}
-                        />
-                    </TabsContent>
-                    <TabsContent value="news" className="flex-1 p-4">
-                        <NewsFeed news={mockNews} />
-                    </TabsContent>
-                </Tabs>
+                </main>
             </div>
         </div>
-            <SiteFooter className="border-t" />
-    </>
-    )
+    );
 }
-
