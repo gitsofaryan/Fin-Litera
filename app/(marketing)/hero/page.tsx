@@ -43,6 +43,28 @@ function HeroPage() {
             <Link href="/login" className={cn(buttonVariants({ size: "lg" }))}>
               Get Started
             </Link>
+
+            <Link
+              href='https://finlitera.streamlit.app/' target="_blank"
+              className={cn(
+              buttonVariants({ variant: "outline", size: "lg" }), 
+              "mt-sm-2",
+              "cursor-pointer",
+              "bg-gradient-to-r",
+              "from-purple-400",
+              "via-pink-500",
+              "to-yellow-500",
+              "transition-all",
+              "duration-300",
+              "ease-in-out",
+              "transform",
+              "hover:scale-105",
+              "hover:translate-y-1",
+              
+              )}
+            >
+              Stream Demo
+            </Link>    
             <a
               href="/#features"
 
@@ -56,8 +78,8 @@ function HeroPage() {
         <div className="flex items-center justify-center flex-row space-x-4">
 
         </div>
-        <div className="relative rounded-xl mx-auto justify-center flex flex-col items-center lg:max-w-[1000px] overflow-hidden overscroll-none">
-          <iframe src="https://finlitera.streamlit.app/?embed=true&embed_options=show_toolbar&embed_options=show_padding&embed_options=show_footer&embed_options=show_colored_line&embed_options=disable_scrolling"  height={600} width={1000} frameBorder={0}></iframe>
+        <div className="relative rounded-xl mx-auto justify-center flex flex-col items-center lg:max-w-[1000px] ">
+          <iframe src="https://finlitera.streamlit.app/?embed=true&embed_options=show_toolbar&embed_options=show_padding&embed_options=show_footer&embed_options=show_colored_line"  height={600} width={1000} frameBorder={0}></iframe>
           <BorderBeam size={300} />
         </div>
 

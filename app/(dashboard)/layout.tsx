@@ -110,12 +110,124 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
       <aside className="w-64 bg-black text-white h-screen p-4 space-y-4 fixed">
         <h2 className="text-lg font-bold">Finance Dashboard</h2>
         <nav className="space-y-2">
-          <Link href="/chat" className="block p-2 rounded hover:bg-gray-700">FinLitera AI</Link>
-          <Link href="/smart-investment-finder" className="block p-2 rounded hover:bg-gray-700">Smart Investment Finder</Link>
-          <Link href="/finance-playground" className="block p-2 rounded hover:bg-gray-700">Finance Playground</Link>
-          <Link href="/financial-literacy-hub" className="block p-2 rounded hover:bg-gray-700">Financial Literacy Hub</Link>
-          <Link href="/ai-portfolio-optimizer" className="block p-2 rounded hover:bg-gray-700">AI Portfolio Optimizer</Link>
-          <Link href="/ai-budget-planner" className="block p-2 rounded hover:bg-gray-700">AI Budget Planner</Link>
+          <Link
+            href='https://finlitera.streamlit.app/'
+            className={cn(
+              buttonVariants({ variant: "outline", size: "lg" }),
+              "mt-sm-2",
+              "cursor-pointer",
+              "hover:bg-gradient-to-r",
+              "hover:from-purple-400",
+              "hover:via-pink-500",
+              "hover:to-yellow-500",
+              "transition-all",
+              "duration-300",
+              "ease-in-out",
+              "transform",
+              "hover:scale-105",
+              "hover:translate-y-1",
+              "hover:text-white"
+            )}
+          >
+      Paper Trading
+          </Link>    
+          <Link href="/chat" className={cn(
+              buttonVariants({ variant: "outline", size: "lg" }),
+              "mt-sm-2",
+              "cursor-pointer",
+              "hover:bg-gradient-to-r",
+              "hover:from-purple-400",
+              "hover:via-pink-500",
+              "hover:to-yellow-500",
+              "transition-all",
+              "duration-300",
+              "ease-in-out",
+              "transform",
+              "hover:scale-105",
+              "hover:translate-y-1",
+              "hover:text-white"
+            )}>FinLitera AI Chat</Link>
+          
+          <Link href="/smart-investment-finder" className={cn(
+              buttonVariants({ variant: "outline", size: "lg" }),
+              "mt-sm-2",
+              "cursor-pointer",
+              "hover:bg-gradient-to-r",
+              "hover:from-purple-400",
+              "hover:via-pink-500",
+              "hover:to-yellow-500",
+              "transition-all",
+              "duration-300",
+              "ease-in-out",
+              "transform",
+              "hover:scale-105",
+              "hover:translate-y-1",
+              "hover:text-white"
+            )}>Smart Investment Finder</Link>
+          <Link href="/finance-playground" className={cn(
+              buttonVariants({ variant: "outline", size: "lg" }),
+              "mt-sm-2",
+              "cursor-pointer",
+              "hover:bg-gradient-to-r",
+              "hover:from-purple-400",
+              "hover:via-pink-500",
+              "hover:to-yellow-500",
+              "transition-all",
+              "duration-300",
+              "ease-in-out",
+              "transform",
+              "hover:scale-105",
+              "hover:translate-y-1",
+              "hover:text-white"
+            )}>Finance Playground</Link>
+          <Link href="/financial-literacy-hub" className={cn(
+              buttonVariants({ variant: "outline", size: "lg" }),
+              "mt-sm-2",
+              "cursor-pointer",
+              "hover:bg-gradient-to-r",
+              "hover:from-purple-400",
+              "hover:via-pink-500",
+              "hover:to-yellow-500",
+              "transition-all",
+              "duration-300",
+              "ease-in-out",
+              "transform",
+              "hover:scale-105",
+              "hover:translate-y-1",
+              "hover:text-white"
+            )}>Financial Literacy Hub</Link>
+          <Link href="/ai-portfolio-optimizer" className={cn(
+              buttonVariants({ variant: "outline", size: "lg" }),
+              "mt-sm-2",
+              "cursor-pointer",
+              "hover:bg-gradient-to-r",
+              "hover:from-purple-400",
+              "hover:via-pink-500",
+              "hover:to-yellow-500",
+              "transition-all",
+              "duration-300",
+              "ease-in-out",
+              "transform",
+              "hover:scale-105",
+              "hover:translate-y-1",
+              "hover:text-white"
+            )}>AI Portfolio Optimizer</Link>
+          <Link href="/ai-budget-planner" className={cn(
+              buttonVariants({ variant: "outline", size: "lg" }),
+              "mt-sm-2",
+              "cursor-pointer",
+              "hover:bg-gradient-to-r",
+              "hover:from-purple-400",
+              "hover:via-pink-500",
+              "hover:to-yellow-500",
+              "transition-all",
+              "duration-300",
+              "ease-in-out",
+              "transform",
+              "hover:scale-105",
+              "hover:translate-y-1",
+              "hover:text-white"
+            )}>AI Budget Planner</Link>
         </nav>
       </aside>
 
